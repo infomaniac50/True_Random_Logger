@@ -17,3 +17,5 @@ The random data was tested by the Die Hard randomness test suite and, as
 far as my non statistics brain can tell, the randomness looks good. 
 Entropy as measured by ent.exe (not related to die hard suite) is 
 7.999999 bits of randomness per byte using ~30MB of test data.
+
+ent.exe can be found at http://www.fourmilab.ch/random/
