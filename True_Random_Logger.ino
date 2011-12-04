@@ -5,10 +5,6 @@
 /*  4/21/2011                   */
 /********************************/
 
-#define USE_SERIAL       0
-#define ECHO_TO_SERIAL   0 // echo data to serial port
-#define WAIT_TO_START    0 // Wait for serial input in setup()
-
 #define BINS_SIZE 256
 #define CALIBRATION_SIZE 50000
 
@@ -20,31 +16,52 @@
 #define BINARY 1
 #define ASCII_BOOL 2
 
-#include <SD.h>
+/*Data Capture Options*/
+#define SERIAL_ONLY      0
+#define SD_ONLY          1
+#define BOTH             2
+
+/*SD Card Debug Options*/
+#define NO_DEBUG         0
+#define SERIAL_DEBUG     1
+#define LED_DEBUG        2
+
 
 /***  Configure the RNG **************/
+#define DEBUG_MODE  SERIAL_DEBUG
+#define DATA_MODE  SERIAL_ONLY
 int bias_removal = VON_NEUMANN;
-int output_format = BINARY;
+int output_format = ASCII_BYTE;
 int baud_rate = 19200;
 /*************************************/
 
-const int chipSelect = 4;
-const int adc_pin = 8;
+const int adc_pin = A0;
 const int led_pin = 13;
 unsigned int bins[BINS_SIZE];
 boolean initializing = true;
 unsigned int calibration_counter = 0;
+
+#if DATA_MODE  !=  SERIAL_ONLY
+#include <SD.h>
+const int chipSelect = 4;
 char* name = "RANDOM.DAT";
 File file;
+#endif
 
 void setup(){
   pinMode(led_pin, OUTPUT);
-#if USE_SERIAL
-  Serial.begin(baud_rate);
-#if WAIT_TO_START
+#if DEBUG_MODE == SERIAL_DEBUG || DATA_MODE  !=  SD_ONLY
+Serial.begin(baud_rate);
+#endif  
+
+#if DEBUG_MODE == SERIAL_DEBUG
   Serial.println("Type any character to start");
   while (!Serial.available());
-#endif //WAIT_TO_START
+#endif
+
+#if DATA_MODE  !=  SERIAL_ONLY
+
+#if DEBUG_MODE == SERIAL_DEBUG
   Serial.print("Initializing SD card...");
 #endif
   // make sure that the default chip select pin is set to
@@ -57,26 +74,46 @@ void setup(){
 #endif
   // see if the card is present and can be initialized:
   if (!SD.begin(chipSelect)) {
-#if USE_SERIAL
+#if DEBUG_MODE  ==  SERIAL_DEBUG
     Serial.println("Card failed, or not present");
 #endif
-    // don't do anything more:
+
+#if DEBUG_MODE  ==  LED_DEBUG
+    blinkLedDelay(1000);
+    delay(1000);
+    blinkLedDelay(1000);
+    delay(1000);
+    blinkLedDelay(1000);
+#endif
+// don't do anything more:
     return;
   }
+
   file = SD.open(name, FILE_WRITE);
   file.seek(file.size());
 
-#if USE_SERIAL  
+#if DEBUG_MODE  ==  SERIAL_DEBUG  
   Serial.print("Logging to: ");
   Serial.println(name);
-  Serial.print("Free RAM: ");       // This can help with debugging, running out of RAM is bad
-  Serial.println(FreeRam());
+//  Serial.print("Free RAM: ");       // This can help with debugging, running out of RAM is bad
+//  Serial.println(FreeRam());
 #endif
+
+#endif //DATA_MODE != SERIAL_ONLY
+
   for (int i=0; i < BINS_SIZE; i++){
     bins[i] = 0; 
   }
-#if USE_SERIAL
+#if DEBUG_MODE  ==  SERIAL_DEBUG
   Serial.println("BINS Done");
+#endif
+
+#if DEBUG_MODE  ==  LED_DEBUG
+  blinkLedDelay(250);
+  delay(250);
+  blinkLedDelay(250);
+  delay(250);
+  blinkLedDelay(250);
 #endif
 }
 
@@ -154,23 +191,24 @@ void buildByte(boolean input){
   if(byte_counter == 0){
     if (output_format == ASCII_BYTE)
     {
+#if DATA_MODE != SERIAL_ONLY      
       file.print(',');    
       file.print(out, DEC);
-      
-#if USE_SERIAL
-#if ECHO_TO_SERIAL
+#endif
+
+#if DATA_MODE != SD_ONLY
       Serial.println(out, DEC);
-#endif //ECHO_TO_SERIAL
 #endif
     }
 
     if (output_format == BINARY)
     { 
-      file.print(out, BYTE);
-#if USE_SERIAL
-#if ECHO_TO_SERIAL
-      Serial.print(out, BYTE);
-#endif //ECHO_TO_SERIAL
+#if DATA_MODE != SERIAL_ONLY
+      file.write(out);
+#endif
+
+#if DATA_MODE != SD_ONLY
+      Serial.write(out);
 #endif
     }
     out = 0;  
@@ -178,15 +216,22 @@ void buildByte(boolean input){
   }
 
   if (output_format == ASCII_BOOL)
-  { 
+  {
+#if DATA_MODE != SERIAL_ONLY
     file.print(',');    
     file.print(input, DEC);
-#if USE_SERIAL
-#if ECHO_TO_SERIAL
+#endif
+
+#if DATA_MODE != SD_ONLY
     Serial.print(input, DEC);
-#endif //ECHO_TO_SERIAL
 #endif
   }
+
+#if DATA_MODE != SD_ONLY
+  Serial.flush();
+#endif
+
+#if DATA_MODE != SERIAL_ONLY
   if (sync_counter >= 2048)
   {
     file.flush();
@@ -195,7 +240,7 @@ void buildByte(boolean input){
     blinkLed();
     sync_counter = 0;
   }
-
+#endif
 }
 
 
@@ -233,9 +278,18 @@ void printStatus(){
   threshold = (num_increments + 1) * increment;
   if(calibration_counter > threshold){
     num_increments++;
-    //Serial.print("*");
+#if DEBUG_MODE == SERIAL_DEBUG
+    Serial.print("*");
+#endif
     blinkLed();
   }   
+}
+
+void blinkLedDelay(int time)
+{
+  digitalWrite(led_pin, HIGH);
+  delay(time);
+  digitalWrite(led_pin, LOW);
 }
 
 void blinkLed(){
