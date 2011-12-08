@@ -3,19 +3,15 @@ True Random Logger
 Circuit Design and Programming by Rob Seward 2008-2009
 Edited by Derek Chafin 4-11-2011
 
-Uses avalanche breakdown from two reversed biased transistors to create 
+I made a post on my blog at http://www.coding-squared.com/blog/?p=49
+
+Uses avalanche breakdown from a reversed biased transistor to create 
 quantum noise fluctuations. The noise is amplified and then read as an 
 analog voltage on the Arduino.
 
 The original program and circuit design is by Rob Seward which can be 
 found at http://robseward.com/misc/RNG2/
 
-This implementation takes the program a step further by adding an SD 
-card logging capabilities for untethered random awesomeness. 
+This implementation takes the program a step further by adding Serial 
+and SD card logging capabilities for random awesomeness. 
 
-The random data was tested by the Die Hard randomness test suite and, as 
-far as my non statistics brain can tell, the randomness looks good. 
-Entropy as measured by ent.exe (not related to die hard suite) is 
-7.999999 bits of randomness per byte using ~30MB of test data.
-
-ent.exe can be found at http://www.fourmilab.ch/random/
