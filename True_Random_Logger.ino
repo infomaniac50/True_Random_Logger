@@ -15,18 +15,20 @@ long baud_rate = 57600;
 /*************************************/
 
 const int adc_pin = A0;
-
+const int led_pin = 13;
 const int length = 4;
 const byte startBytes[length] = { 0xa9, 0xf8, 0xf7, 0x40 };
 
 Logger logger(SERIAL_OUTPUT, format, true);
-Random bits(adc_pin, VON_NEUMANN);
+Random bits(adc_pin, led_pin, VON_NEUMANN);
 SyncWait waiter;
 
 void setup(){
   Serial.begin(baud_rate);
-  //Serial.println("Waiting for input...");
+  
+//  waiter.doSyncWait();
   waiter.doSyncWait(startBytes, length);
+  bits.calibrate();
   if (logger.init() != 0)
   {
     return;
@@ -34,6 +36,6 @@ void setup(){
 }
 
 void loop(){
-    byte data = bits.process();
-    logger.logData(data);  
+  byte data = bits.process();
+  logger.logData(data);  
 }
