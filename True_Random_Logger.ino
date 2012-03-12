@@ -19,7 +19,7 @@ const int led_pin = 13;
 const int length = 4;
 const byte startBytes[length] = { 0xa9, 0xf8, 0xf7, 0x40 };
 
-Logger logger(SERIAL_OUTPUT, format, true);
+Logger logger(SERIAL_OUTPUT, format, true, 10);
 Random bits(adc_pin, led_pin, VON_NEUMANN);
 SyncWait waiter;
 
