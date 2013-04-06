@@ -1,10 +1,10 @@
 /********************************/
 /*  Rob Seward 2008-2009        */
-/*  Derek Chafin 2010-2011      */
-/*  v1.5                        */
+/*  Derek Chafin 2010-2013      */
+/*  v1.5.1                      */
 /*  4/21/2011                   */
 /********************************/
-
+#include <SD.h>
 #include <Random.h>
 #include <Logger.h>
 #include <SyncWait.h>
@@ -20,7 +20,7 @@ const int length = 4;
 const byte startBytes[length] = { 0xa9, 0xf8, 0xf7, 0x40 };
 
 Logger logger(SERIAL_OUTPUT, format, true, 10);
-Random bits(adc_pin, led_pin, VON_NEUMANN);
+Random bits(adc_pin, VON_NEUMANN);
 SyncWait waiter;
 
 void setup(){
@@ -36,6 +36,6 @@ void setup(){
 }
 
 void loop(){
-  byte data = bits.process();
+  byte data = bits.get_byte();
   logger.logData(data);  
 }
