@@ -65,8 +65,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="..\libraries\Logger\keywords.txt" />
+    <None Include="..\libraries\Logger\README.markdown" />
     <None Include="..\libraries\Random\keywords.txt" />
+    <None Include="..\libraries\Random\README.markdown" />
     <None Include="..\libraries\SyncWait\keywords.txt" />
+    <None Include="..\libraries\SyncWait\README.markdown" />
     <None Include="README.markdown" />
     <None Include="True_Random_Logger.ino">
       <FileType>CppCode</FileType>

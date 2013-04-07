@@ -38,6 +38,15 @@
       <Filter>Documents\SyncWait</Filter>
     </None>
     <None Include="README.markdown" />
+    <None Include="..\libraries\Logger\README.markdown">
+      <Filter>Documents\Logger</Filter>
+    </None>
+    <None Include="..\libraries\Random\README.markdown">
+      <Filter>Documents\Random</Filter>
+    </None>
+    <None Include="..\libraries\SyncWait\README.markdown">
+      <Filter>Documents\SyncWait</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Visual Micro\.True_Random_Logger.vsarduino.h">
