@@ -1,6 +1,7 @@
 /*
 Original RNG circuit and code by Rob Seward 2008-2009
 Project Page: http://robseward.com/misc/RNG2/
+License: http://creativecommons.org/licenses/by-nc/2.5/
 */
 
 /*
